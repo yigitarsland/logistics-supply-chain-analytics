@@ -1,0 +1,13 @@
+# Ignore all raw data files
+data/raw/*
+!data/raw/.gitkeep
+
+# System & OS metadata
+.DS_Store
+Thumbs.db
+
+# Python / Virtual environment (if analytics scripts are used)
+__pycache__/
+*.py[cod]
+.env
+.venv/
