@@ -1,5 +1,5 @@
 -- 1. Create Customer Dimension
-CREATE TABLE Dim_Customer (
+CREATE TABLE "DW".Dim_Customer (
     Customer_Id INT PRIMARY KEY,
     Customer_Fname VARCHAR(100),
     Customer_Lname VARCHAR(100),
@@ -8,7 +8,7 @@ CREATE TABLE Dim_Customer (
 );
 
 -- 2. Create Product Dimension
-CREATE TABLE Dim_Product (
+CREATE TABLE "DW".Dim_Product (
     Product_Card_Id INT PRIMARY KEY,
     Product_Name VARCHAR(255),
     Category_Name VARCHAR(100),
@@ -17,7 +17,7 @@ CREATE TABLE Dim_Product (
 );
 
 -- 3. Create Fulfillment Fact Table
-CREATE TABLE Fact_Fulfillment (
+CREATE TABLE "DW".Fact_Fulfillment (
     Order_Item_Id INT PRIMARY KEY,
     Order_Id INT,
     Customer_Id INT,
@@ -43,19 +43,25 @@ CREATE TABLE Fact_Fulfillment (
     Sales DECIMAL(10,2),
 
     -- Foreign Key Constraints
-    FOREIGN KEY (Customer_Id) REFERENCES DW.dim_customer(Customer_Id),
-    FOREIGN KEY (Product_Card_Id) REFERENCES DW.dim_product(Product_Card_Id)
+    FOREIGN KEY (Customer_Id) REFERENCES "DW".dim_customer(Customer_Id),
+    FOREIGN KEY (Product_Card_Id) REFERENCES "DW".dim_product(Product_Card_Id)
 );
 
 -- Create indexes for foreign key optimization
 CREATE INDEX idx_fact_fulfillment_customer
-    ON DW.fact_fulfillment(Customer_Id);
+    ON "DW".fact_fulfillment(Customer_Id);
 
 CREATE INDEX idx_fact_fulfillment_product
-    ON DW.fact_fulfillment(Product_Card_Id);
+    ON "DW".fact_fulfillment(Product_Card_Id);
 
 CREATE INDEX idx_fact_fulfillment_order_date
-    ON DW.fact_fulfillment(Order_Date);
+    ON "DW".fact_fulfillment(Order_Date);
+
+-- Country Mapping Table
+CREATE TABLE "DW".country_mapping (
+    country_es VARCHAR(100),
+    country_en VARCHAR(100)
+);
 
 
 -- Index Checks
