@@ -43,16 +43,40 @@ CREATE TABLE Fact_Fulfillment (
     Sales DECIMAL(10,2),
 
     -- Foreign Key Constraints
-    FOREIGN KEY (Customer_Id) REFERENCES Dim_Customer(Customer_Id),
-    FOREIGN KEY (Product_Card_Id) REFERENCES Dim_Product(Product_Card_Id)
+    FOREIGN KEY (Customer_Id) REFERENCES DW.dim_customer(Customer_Id),
+    FOREIGN KEY (Product_Card_Id) REFERENCES DW.dim_product(Product_Card_Id)
 );
 
 -- Create indexes for foreign key optimization
 CREATE INDEX idx_fact_fulfillment_customer
-    ON Fact_Fulfillment(Customer_Id);
+    ON DW.fact_fulfillment(Customer_Id);
 
 CREATE INDEX idx_fact_fulfillment_product
-    ON Fact_Fulfillment(Product_Card_Id);
+    ON DW.fact_fulfillment(Product_Card_Id);
 
 CREATE INDEX idx_fact_fulfillment_order_date
-    ON Fact_Fulfillment(Order_Date);
+    ON DW.fact_fulfillment(Order_Date);
+
+
+-- Index Checks
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE schemaname ILIKE 'dw' 
+  AND tablename ILIKE 'fact_fulfillment';
+
+-- FK Checks
+SELECT
+    tc.constraint_name, 
+    tc.table_name, 
+    kcu.column_name, 
+    ccu.table_name AS foreign_table_name,
+    ccu.column_name AS foreign_column_name 
+FROM information_schema.table_constraints AS tc 
+JOIN information_schema.key_column_usage AS kcu
+  ON tc.constraint_name = kcu.constraint_name
+  AND tc.table_schema = kcu.table_schema
+JOIN information_schema.constraint_column_usage AS ccu
+  ON ccu.constraint_name = tc.constraint_name
+WHERE tc.constraint_type = 'FOREIGN KEY' 
+  AND tc.table_schema ILIKE 'dw'
+  AND tc.table_name ILIKE 'fact_fulfillment';
