@@ -1,4 +1,41 @@
 -- AUTOMATED CHECKS
+-- QA: Check for Orphaned Records (Should return 0)
+SELECT 
+    'Orphaned Customers' AS defect_type, 
+    COUNT(*) AS defect_count 
+FROM "DW".fact_fulfillment 
+WHERE Customer_Id NOT IN (SELECT Customer_Id FROM "DW".dim_customer)
+UNION ALL
+SELECT 
+    'Orphaned Products', 
+    COUNT(*) 
+FROM "DW".fact_fulfillment 
+WHERE Product_Card_Id NOT IN (SELECT Product_Card_Id FROM "DW".dim_product);
+
+-- QA: Check for duplicate Primary Keys (Should return 0 rows)
+SELECT 
+    Order_Item_Id, 
+    COUNT(*) as appearance_count
+FROM "DW".fact_fulfillment
+GROUP BY Order_Item_Id
+HAVING COUNT(*) > 1;
+
+-- QA: Check for illogical dates (Shipping before Ordering)
+SELECT 
+    Order_Item_Id, 
+    Order_Date, 
+    Shipping_Date
+FROM "DW".fact_fulfillment
+WHERE Shipping_Date < Order_Date;
+
+-- QA: Check for unexpected NULLs in critical fields
+SELECT 
+    COUNT(*) AS rows_with_null_metrics
+FROM "DW".fact_fulfillment
+WHERE Order_Date IS NULL 
+   OR Sales IS NULL 
+   OR Order_Item_Quantity IS NULL;
+
 -- Calculate the average variance between scheduled and real shipping days across different delivery statuses.
 SELECT 
     Delivery_Status,
